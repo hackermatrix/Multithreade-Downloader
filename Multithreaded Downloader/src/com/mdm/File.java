@@ -5,9 +5,12 @@ Divide the file into smaller portions and assign each portion to a DownloadThrea
 Provide methods to retrieve information about the file and its assigned portion.
  */
 
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 public class File{
 	private int file_id;
-	private double file_size;
+	private long file_size;
 	private String file_type;
 	private String file_name;
 	private String file_url;
@@ -21,14 +24,34 @@ public class File{
 		this.file_url = url;
 		this.file_name = file_name;
 		this.file_desti = file_desti;	
+		
+		try {
+			
+		URL url_rep = new URL(url);
+		HttpURLConnection uc = (HttpURLConnection)url_rep.openConnection(); // establishing connection
+
+		this.file_size = uc.getContentLengthLong();
+		this.file_type=uc.getContentType();
+		
+		}
+		
+		catch(Exception e) {System.out.print(e);}
 	}
 	
-	
-	
-	public double getFile_size() {
+
+
+
+	public File() {
+		// TODO Auto-generated constructor stub
+	}
+
+
+
+
+	public long getFile_size() {
 		return file_size;
 	}
-	public void setFile_size(double file_size) {
+	public void setFile_size(long file_size) {
 		this.file_size = file_size;
 	}
 	public String getFile_type() {
