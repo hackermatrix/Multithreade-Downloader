@@ -4,30 +4,47 @@ package com.mdm;
 
 import java.io.*;
 import java.net.URL;
-import java.net.URLConnection;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
-public class DownloadThread {
+public class DownloadThread extends Thread{
 	private double task_offset;
 	private int file_id;
-	private double task_size;
+	private double end_range;
 	private File total_file;
+	private ReentrantLock lock;  
+	private FileOutputStream fout;
+	private byte[] buff = new byte[1000];
 	
 	
 	
-	DownloadThread(int file_id,double task_offset,double task_size,File total){
+	DownloadThread(int file_id,double task_offset,double end_range,File total,ReentrantLock lock,FileOutputStream fout){
 		this.file_id = file_id;
 		this.task_offset =task_offset;
-		this.task_size = task_size;
+		this.end_range = end_range;
 		this.total_file = total;
+		this.lock = lock;
+		this.fout = fout;
 	}
 	
-	void initiateDownload() {
+	public void run() {
+		try {
+			HttpURLConnection huc = (HttpURLConnection)new URL(total_file.getFile_url()).openConnection();
+			InputStream data = huc.getInputStream();
+			int bytesREAD;
+			while((bytesREAD=data.read(buff))!=-1) {
+				fout.write(buff);
+				
+			}
+			
+			
+			
+		}
+		catch(Exception e){System.out.println(e);}
 		
 	}
-	void reportStatus() {
-		
-	}
+
 }    
