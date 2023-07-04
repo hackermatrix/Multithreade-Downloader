@@ -8,7 +8,7 @@ Provide methods to retrieve information about the file and its assigned portion.
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class File{
+public class DownloadFile{
 	private int file_id;
 	private long file_size;
 	private String file_type;
@@ -19,7 +19,7 @@ public class File{
 	
 	
 	
-	File(int id,String url,String file_name,String file_desti){
+	DownloadFile(int id,String url,String file_name,String file_desti){
 		this.file_id = id;
 		this.file_url = url;
 		this.file_name = file_name;
@@ -41,7 +41,7 @@ public class File{
 
 
 
-	public File() {
+	public DownloadFile() {
 		// TODO Auto-generated constructor stub
 	}
 

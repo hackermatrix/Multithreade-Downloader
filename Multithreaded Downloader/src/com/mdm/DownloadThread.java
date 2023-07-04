@@ -14,47 +14,58 @@ public class DownloadThread extends Thread{
 	private long task_offset;
 	private int file_id;
 	private long end_range;
-	private File total_file;
-	private ReentrantLock lock;  
+	private DownloadFile total_file; 
 	private FileOutputStream fout;
-	private byte[] buff = new byte[4096];
+	private byte[] buff = new byte[DownMgr.BUFFER_SIZE];
+	private int seq_num;
+	private long Downloaded=0;
+	private long chunk_size;
+
 	
 	
 	
-	DownloadThread(int file_id,long task_offset,long end_range,File total,ReentrantLock lock,FileOutputStream fout){
+	DownloadThread(int file_id,long task_offset,long end_range,DownloadFile total,int seq_num,long chunk_size) throws FileNotFoundException{
 		this.file_id = file_id;
 		this.task_offset =task_offset;
 		this.end_range = end_range;
 		this.total_file = total;
-		this.lock = lock;
-		this.fout = fout;
+		this.seq_num = seq_num;
+		this.chunk_size = chunk_size;
+		
+		// Writing Each task portion to the file system
+		this.fout = new FileOutputStream(total_file.getFile_desti()+"."+total_file.getFile_name()+"."+seq_num+".tmp");
 	}
 	
+	public DownloadThread() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public void run() {
 		
 		try {
-			System.out.println(this.getName()+" STARTED.....");
+			System.out.println(this.getName()+" STARTED....."+" offset : "+ task_offset+" endrange : "+end_range);
+
 			HttpURLConnection huc = (HttpURLConnection)new URL(total_file.getFile_url()).openConnection();
 			huc.setRequestProperty("Range", "bytes="+task_offset+"-"+end_range);
 			InputStream data = huc.getInputStream();
 
 			int bytesREAD;
-			lock.lock();
 
-			while((bytesREAD=data.read(buff))!=-1) {
-				System.out.println(this.getName()+" WRITING.....");
-				
-
+			while((bytesREAD=data.read(buff))!=-1) {				
 				fout.write(buff,0,bytesREAD);
-				
+				Downloaded+=bytesREAD;
 			
-			}
-			lock.unlock();
-			
-
+			}		
+//			if(Downloaded == chunk_size) {
+//				System.out.println(this.getName()+" DONE.....");
+//			}
+//			else {
+//				System.out.println(this.getName()+" INCOMPLETE.....!!!> ["+Downloaded+"]/["+(end_range-task_offset)+"]");
+//			}
+			System.out.println(this.getName()+" DONE.....");
 			data.close();
 			huc.disconnect();
-			System.out.println(this.getName()+" DONE.....");
+			
 		}
 		
 		catch(Exception e){System.out.println(e);}
